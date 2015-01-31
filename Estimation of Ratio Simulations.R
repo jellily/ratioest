@@ -52,13 +52,9 @@ for(i in 2:length(true.ratio))
 
 out <- data.frame(out)
 out[,1] <- out[,1] - 1
-
-
 results <- data.frame(out[,1], rowMeans(out[,2:1001]))
-names(results) <- c("true.ratio", "estimate")
+names(results) <- c("truth", "estimate")
 
-
-results$truth <- results$true.ratio - 1
 
 plot <- ggplot(results, aes(truth, estimate)) + geom_point() + theme_bw()
 plot <- plot + geom_abline(intercept = 0, slope = 1)

@@ -5,6 +5,7 @@ setwd("~/Documents/ratioest")
 # Read in real data
 true.dat <- read.csv("results.csv", header = FALSE, row.names = 1)
 
+# Bootstrap for real data
 res <- c()
 set.seed(98481)
 for(i in 1:5000)
@@ -20,6 +21,8 @@ mc <- mean(as.numeric(true.dat[24,]))
 hist(res)
 abline(v = abs(mt-mc)/mc)
 
+
+# Simulations ---
 # function to do one simulation
 sim.one <- function(r, cont.mean = 94)
 {
@@ -43,11 +46,13 @@ out <- cbind(true.ratio[1], t(replicate(1000, sim.one(true.ratio[1]))))
 
 for(i in 2:length(true.ratio))
 {
-  res <-replicate(1000, sim.one(true.ratio[i]))
+  res <- replicate(1000, sim.one(true.ratio[i]))
   out <- rbind(out, cbind(true.ratio[i], t(res)))  
 }
 
 out <- data.frame(out)
+out[,1] <- out[,1] - 1
+
 
 results <- data.frame(out[,1], rowMeans(out[,2:1001]))
 names(results) <- c("true.ratio", "estimate")

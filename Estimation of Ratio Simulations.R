@@ -39,7 +39,7 @@ sim.one <- function(r, cont.mean = 94)
 
 
 # code to replicate simulations across true ratios of means
-true.ratio <- seq(from = 1, to = 2, length.out = 100)
+true.ratio <- seq(from = 1, to = 20, length.out = 100)
 
 set.seed(64684)
 out <- cbind(true.ratio[1], t(replicate(1000, sim.one(true.ratio[1]))))
@@ -52,10 +52,23 @@ for(i in 2:length(true.ratio))
 
 out <- data.frame(out)
 out[,1] <- out[,1] - 1
-results <- data.frame(out[,1], rowMeans(out[,2:1001]))
-names(results) <- c("truth", "estimate")
+bias.out <- out
+for(i in 1:nrow(out))
+{
+  bias.out[i, 2:ncol(out)] <- (out[i,2:ncol(out)] - out[i,1])^2
+  out[i, 2:ncol(out)] <- (out[i,2:ncol(out)] - out[i,1])
+}
 
 
+results <- data.frame(out[,1], rowMeans(out[,2:1001]), apply(out[,2:1001], 2, min), apply(out[,2:1001], 2, max))
+names(results) <- c("truth", "estimate", "min", "max")
 plot <- ggplot(results, aes(truth, estimate)) + geom_point() + theme_bw()
-plot <- plot + geom_abline(intercept = 0, slope = 1)
+plot <- plot + geom_errorbar(aes(x = truth, ymin = min, ymax = max))
+plot
+
+
+results <- data.frame(bias.out[,1], rowMeans(bias.out[,2:1001]), apply(bias.out[,2:1001], 2, min), apply(out[,2:1001], 2, max))
+names(results) <- c("truth", "estimate", "min", "max")
+plot <- ggplot(results, aes(truth, estimate)) + geom_point() + theme_bw()
+plot <- plot + geom_errorbar(aes(x = truth, ymin = min, ymax = max))
 plot
